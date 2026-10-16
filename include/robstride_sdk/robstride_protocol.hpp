@@ -160,6 +160,51 @@ constexpr uint32_t STALL_OVERLOAD = 1u << 14;
 constexpr uint32_t PHASE_A_OVERCURRENT = 1u << 16;
 }  // namespace FaultBit
 
+// Status frame ID bits 8..13, kept as one byte.
+namespace StatusFlag
+{
+constexpr uint8_t UNDERVOLTAGE = 1u << 0;
+constexpr uint8_t OVERCURRENT = 1u << 1;
+constexpr uint8_t OVERTEMPERATURE = 1u << 2;
+constexpr uint8_t ENCODER_FAULT = 1u << 3;
+constexpr uint8_t STALL_OVERLOAD = 1u << 4;
+constexpr uint8_t UNCALIBRATED = 1u << 5;
+}  // namespace StatusFlag
+
+inline std::string DescribeStatusFlags(uint8_t flags)
+{
+  static const struct {uint8_t bit; const char * name;} kNames[] = {
+    {StatusFlag::UNDERVOLTAGE, "undervoltage"}, {StatusFlag::OVERCURRENT, "overcurrent"},
+    {StatusFlag::OVERTEMPERATURE, "overtemperature"}, {StatusFlag::ENCODER_FAULT, "encoder_fault"},
+    {StatusFlag::STALL_OVERLOAD, "stall_overload"}, {StatusFlag::UNCALIBRATED, "uncalibrated"}};
+  std::string text;
+  for (const auto & item : kNames) {
+    if (flags & item.bit) {
+      text += (text.empty() ? "" : "+") + std::string(item.name);
+    }
+  }
+  return text;
+}
+
+inline std::string DescribeFaultBits(uint32_t bits)
+{
+  static const struct {uint32_t bit; const char * name;} kNames[] = {
+    {FaultBit::OVERTEMPERATURE, "overtemperature"}, {FaultBit::DRIVER_CHIP, "driver_chip"},
+    {FaultBit::UNDERVOLTAGE, "undervoltage"}, {FaultBit::OVERVOLTAGE, "overvoltage"},
+    {FaultBit::PHASE_B_OVERCURRENT, "phase_b_overcurrent"},
+    {FaultBit::PHASE_C_OVERCURRENT, "phase_c_overcurrent"},
+    {FaultBit::ENCODER_UNCALIBRATED, "encoder_uncalibrated"}, {FaultBit::HARDWARE_ID, "hardware_id"},
+    {FaultBit::POSITION_INIT, "position_init"}, {FaultBit::STALL_OVERLOAD, "stall_overload"},
+    {FaultBit::PHASE_A_OVERCURRENT, "phase_a_overcurrent"}};
+  std::string text;
+  for (const auto & item : kNames) {
+    if (bits & item.bit) {
+      text += (text.empty() ? "" : "+") + std::string(item.name);
+    }
+  }
+  return text;
+}
+
 enum class RunState : uint8_t
 {
   RESET = 0,
